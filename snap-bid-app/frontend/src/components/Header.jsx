@@ -8,7 +8,7 @@ function Header(props) {
 
     const handleLogout = async ()=>{
         try {
-            const response = await fetch('https://silent-auction-api.vercel.app/user/logout', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/user/logout`, {
                 method: 'POST',
                 credentials: 'include'
             });

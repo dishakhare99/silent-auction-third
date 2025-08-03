@@ -18,7 +18,7 @@ function App() {
 
   const checkToken = async () => {
     try {
-      const response = await fetch('https://silent-auction-api.vercel.app/user/check-token', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/check-token`, {
         method: 'GET',
         credentials: 'include' // This ensures cookies are sent with the request
       });
@@ -52,7 +52,7 @@ function App() {
   const handleSendBid = async (_id, bidAmount) => {
     const details = { amount: bidAmount };
     try {
-        const response = await fetch('https://silent-auction-api.vercel.app/items/' + _id, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/items/` + _id, {
             method: 'PUT',
             body: JSON.stringify(details),
             headers: {

@@ -18,7 +18,7 @@ function ItemForm() {
             setImage('');
         }
         const tempItem = {title, description, minBid, image};
-        const newItem = await fetch('https://silent-auction-api.vercel.app/items', {
+        const newItem = await fetch(`${import.meta.env.VITE_API_URL}/items`, {
             method: 'POST',
             body: JSON.stringify(tempItem),
             headers: {

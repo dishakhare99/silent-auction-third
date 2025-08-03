@@ -18,7 +18,7 @@ function LoginForm(props) {
             setPassword('');
         }
         const credentials = {userName, password};
-        const user = await fetch('https://silent-auction-api.vercel.app/user/login', {
+        const user = await fetch(`${import.meta.env.VITE_API_URL}/user/login`, {
             method: 'POST',
             body: JSON.stringify(credentials),
             headers: {
