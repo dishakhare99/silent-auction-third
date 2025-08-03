@@ -10,6 +10,9 @@ function AboutAuction(props) {
     const deadline = props.deadline;
     const now = new Date();
     const difference = deadline - now;
+    if (difference <= 0) {
+    return "Auction Ended";
+    }
     const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((difference / (1000 * 60)) % 60);
     return `${hours} hours, ${minutes} minutes`;
