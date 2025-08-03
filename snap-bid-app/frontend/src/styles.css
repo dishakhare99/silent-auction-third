@@ -655,3 +655,27 @@ a:focus-visible {
 .add-form .button:hover {
   background-color: #e7a07f;
 }
+
+.winners-section {
+  background-color: #f9f9f9;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  margin: 2rem auto;
+  max-width: 800px;
+}
+
+.winners-section h2 {
+  color: #007bff;
+  margin-bottom: 1rem;
+}
+
+.winners-section ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.winners-section li {
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
+}
+
