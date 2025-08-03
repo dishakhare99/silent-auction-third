@@ -47,7 +47,7 @@ const createItem = async (req,res)=>{
         if(!minBid) {
             emptyFields.push('Minimum Bid');
         }
-        else if (isNaN(minBid) || minBid < 0) {
+        else if (isNaN(minBid) || Number(minBid) < 0) {
             emptyFields.push('Minimum Bid');
         }
         if(!image) {
