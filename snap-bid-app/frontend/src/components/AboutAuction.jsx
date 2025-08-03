@@ -5,19 +5,21 @@ function AboutAuction(props) {
 
   const now = new Date();
   const deadlineDate = new Date(deadline);
-  const deadlineDay = deadlineDate.toDateString();
   const today = now.toDateString();
+  const deadlineDay = deadlineDate.toDateString();
 
-  const isSameDay = deadlineDay === today;
-  const auctionEnded = now > deadlineDate && !isSameDay;
-  const nextAuctionStart = new Date(deadlineDate.getTime() + 24 * 60 * 60 * 1000); // 24 hours later
+  // ✅ Fix: Only consider auction ended if the current date is after the deadline date
+  const auctionEnded = today !== deadlineDay && now > deadlineDate;
+  const nextAuctionStart = new Date(deadlineDate.getTime() + 24 * 60 * 60 * 1000);
+
   const progressPercent = Math.min((total / target) * 100, 100);
 
   const timeRemaining = () => {
     if (auctionEnded) return "Auction Ended";
 
-    const difference = deadlineDate - now;
-    if (difference <= 0) return "Auction Ended";
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+    const difference = endOfDay - now;
 
     const hours = Math.floor(difference / (1000 * 60 * 60));
     const minutes = Math.floor((difference / (1000 * 60)) % 60);
@@ -28,19 +30,21 @@ function AboutAuction(props) {
   return (
     <div>
       <div className="about-section">
-        <h2 className="remaining-time">Time Remaining: {timeRemaining()}</h2>
+        <h2 className="remaining-time">
+          Time Remaining: {timeRemaining()}
+        </h2>
 
         <p>
-          Embark on a journey of generosity at our virtual Summer Charity Gala
-          SnapBid, hosted on the cutting-edge SnapBid platform. Delight in
-          bidding on luxury getaways, art, and exclusive experiences — all for a
-          meaningful cause.
+          Embark on a journey of generosity at our virtual Summer Charity Gala SnapBid,
+          hosted on the cutting-edge SnapBid platform. Delight in bidding on luxury getaways,
+          captivating art, and exclusive experiences — all for a meaningful cause.
         </p>
 
         {auctionEnded ? (
           <>
             <p style={{ marginTop: "1rem", fontWeight: "bold", color: "#b30000" }}>
-              ⏳ New auction will start on: <strong>{nextAuctionStart.toLocaleString("en-US")}</strong>
+              ⏳ New auction will start on:{" "}
+              <strong>{nextAuctionStart.toLocaleString("en-US")}</strong>
             </p>
 
             {admin && (
