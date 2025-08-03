@@ -10,13 +10,12 @@ function Item(props) {
   const navigate = useNavigate();
 
   // ✅ Set newBid once item is ready
-  useEffect(() => {
+ useEffect(() => {
     if (item) {
-      if (item.bidHistory?.[0]) {
-        setNewBid(item.bidHistory[0].amount + 1);
-      } else if (item.minBid !== undefined) {
-        setNewBid(item.minBid);
-      }
+      const bid = item?.bidHistory?.[0]?.amount
+        ? item.bidHistory[0].amount + 1
+        : item.minBid || 0;
+      setNewBid(bid);
     }
   }, [item]);
 
@@ -36,9 +35,10 @@ function Item(props) {
 
   const handleSendBid = (e) => {
     e.preventDefault();
-    props.onBid(item._id, Number(newBid));
+    props.onBid(item._id, newBid);
     handleCloseBidMenu();
-    setNewBid(item.bidHistory?.[0] ? item.bidHistory[0].amount + 1 : item.minBid);
+    const nextBid = item?.bidHistory?.[0]?.amount + 1 || item.minBid || 0;
+    setNewBid(nextBid);
   };
 
   return (
