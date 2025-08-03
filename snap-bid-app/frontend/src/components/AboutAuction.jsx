@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom"; // Import NavLink for routing if nee
 
 function AboutAuction(props) {
   const currentProgress = props.total;
+  const auctionEnded = (props.deadline - new Date()) <= 0;
   let goal = props.target;
   const progressPercent = (currentProgress / goal) * 100;
   
@@ -15,7 +16,9 @@ function AboutAuction(props) {
     }
     const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((difference / (1000 * 60)) % 60);
+    if (auctionEnded) return 'Auction Ended';
     return `${hours} hours, ${minutes} minutes`;
+
   };
 
   return (
@@ -33,6 +36,7 @@ function AboutAuction(props) {
           contribute to our goal—join us for an unforgettable evening of giving
           and community.
         </p>
+        {!auctionEnded && (
         <div className="progress-bar-container">
           <div className="progress-bar">
             <div
@@ -47,6 +51,7 @@ function AboutAuction(props) {
             <NavLink className="join-auction-button" to="/login">Login to Join Auction</NavLink>
           )}
         </div>
+      )}
       </div>
     </div>
   );
