@@ -6,7 +6,16 @@ import {useNavigate} from 'react-router-dom';
 function Item(props) {
     const [showModal, setShowModal] = useState(false);
     const [showBidMenu, setShowBidMenu] = useState(false);
-    const [newBid, setNewBid] = useState(props.item.bidHistory[0] ? (props.item.bidHistory[0].amount + 1) : props.item.minBid);
+    // const [newBid, setNewBid] = useState(props.item.bidHistory[0] ? (props.item.bidHistory[0].amount + 1) : props.item.minBid);
+    const [newBid, setNewBid] = useState(() => {
+        if (props.item && props.item.bidHistory && props.item.bidHistory[0]) {
+            return props.item.bidHistory[0].amount + 1;
+        } else if (props.item) {
+            return props.item.minBid;
+        } else {
+            return 0;
+        }
+    });
     const navigate = useNavigate();
 
 
