@@ -21,15 +21,30 @@ function Home(props) {
             .then(response => response.json())
             .then(data => {
                 setItems(data);
-                const auctionData = data.find(obj => obj.title === 'auctiondata');
-                const objective = auctionData.minBid
+
+                // ✅ Safely handle auctiondata object
+      const auctionData = data.find(obj => obj.title === 'auctiondata');
+            if (auctionData) {
+                const objective = auctionData.minBid;
                 const deadline = new Date(auctionData.description);
                 setTarget(objective);
                 setDeadline(deadline);
+            } else {
+                console.warn("No auctiondata item found. Skipping target and deadline setup.");
+            }
             })
-            .catch(error => alert(error)
-        );
-    };
+            .catch(error => alert(error));
+        };
+
+    //             const auctionData = data.find(obj => obj.title === 'auctiondata');
+    //             const objective = auctionData.minBid
+    //             const deadline = new Date(auctionData.description);
+    //             setTarget(objective);
+    //             setDeadline(deadline);
+    //         })
+    //         .catch(error => alert(error)
+    //     );
+    // };
 
     const getTotal = async () => {
         if (items) {
