@@ -102,7 +102,7 @@ function Home(props) {
                 <div className='items-container'>
                     {items && items.map(item => {
                         if (item.title != 'auctiondata'){
-                            return <Item key={item._id} item={item} onDelete={handleDelete} onBid={handleSendBid} auth={props.auth} admin={props.admin}/>
+                            return <Item key={item._id} item={item} onDelete={handleDelete} onBid={handleSendBid} auth={props.auth} admin={props.admin} deadline={deadline}/>
                         }
                     })}
                 </div>

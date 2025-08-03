@@ -1,92 +1,145 @@
-import { NavLink } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 
-function AboutAuction(props) {
-  const { total, target, deadline, auth, admin, onResetAuction } = props;
+function Item(props) {
+  const item = props.item;
+
+  if (!item || typeof item.minBid !== 'number') {
+    return null;
+  }
+
+  const [showModal, setShowModal] = useState(false);
+  const [showBidMenu, setShowBidMenu] = useState(false);
+  const [newBid, setNewBid] = useState(0);
 
   const now = new Date();
-  const deadlineDate = new Date(deadline);
-  const today = now.toDateString();
-  const deadlineDay = deadlineDate.toDateString();
+  const deadline = new Date(props.deadline); // ✅ deadline passed from Home
+  const auctionEnded = now > deadline;
 
-  // ✅ Fix: Only consider auction ended if the current date is after the deadline date
-  const auctionEnded = today !== deadlineDay && now > deadlineDate;
-  const nextAuctionStart = new Date(deadlineDate.getTime() + 24 * 60 * 60 * 1000);
+  const topBid = item.bidHistory?.[0];
 
-  const progressPercent = Math.min((total / target) * 100, 100);
+  useEffect(() => {
+    if (item) {
+      const bid = topBid?.amount ? topBid.amount + 1 : item.minBid || 0;
+      setNewBid(bid);
+    }
+  }, [item]);
 
-  const timeRemaining = () => {
-    if (auctionEnded) return "Auction Ended";
+  const handleShowBidMenu = () => setShowBidMenu(true);
+  const handleCloseBidMenu = () => setShowBidMenu(false);
+  const handleViewAllClick = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
-    const difference = endOfDay - now;
+  const handleDelete = () => {
+    props.onDelete(item._id, item.title);
+  };
 
-    const hours = Math.floor(difference / (1000 * 60 * 60));
-    const minutes = Math.floor((difference / (1000 * 60)) % 60);
-
-    return `${hours} hours, ${minutes} minutes`;
+  const handleSendBid = (e) => {
+    e.preventDefault();
+    props.onBid(item._id, newBid);
+    handleCloseBidMenu();
+    const nextBid = topBid?.amount + 1 || item.minBid || 0;
+    setNewBid(nextBid);
   };
 
   return (
-    <div>
-      <div className="about-section">
-        <h2 className="remaining-time">
-          Time Remaining: {timeRemaining()}
-        </h2>
+    <div className="card">
+      <div className="card-image">
+        <img src={item.image} alt={item.title} />
+      </div>
 
-        <p>
-          Embark on a journey of generosity at our virtual Summer Charity Gala SnapBid,
-          hosted on the cutting-edge SnapBid platform. Delight in bidding on luxury getaways,
-          captivating art, and exclusive experiences — all for a meaningful cause.
-        </p>
+      <div className="card-content">
+        <h2>{item.title}</h2>
+        <p><strong>Description:</strong> {item.description}</p>
 
-        {auctionEnded ? (
-          <>
-            <p style={{ marginTop: "1rem", fontWeight: "bold", color: "#b30000" }}>
-              ⏳ New auction will start on:{" "}
-              <strong>{nextAuctionStart.toLocaleString("en-US")}</strong>
-            </p>
-
-            {admin && (
-              <button
-                onClick={onResetAuction}
-                className="reset-auction-button"
-                style={{
-                  marginTop: "1rem",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  padding: "10px 16px",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}
-              >
-                🔄 Reset Auction Now
-              </button>
-            )}
-          </>
+        {topBid ? (
+          <p><strong>Current Bid:</strong> ${topBid.amount.toLocaleString('en-US')}</p>
         ) : (
-          <div className="progress-bar-container">
-            <div className="progress-bar">
-              <div
-                className="progress"
-                style={{ width: `${progressPercent}%` }}
-              ></div>
-            </div>
-            <p>
-              Progress: ${total.toLocaleString("en-US")} / ${target.toLocaleString("en-US")}
-            </p>
+          <p><strong>Minimum Bid:</strong> ${item.minBid.toLocaleString('en-US')}</p>
+        )}
 
-            {!auth && (
-              <NavLink className="join-auction-button" to="/login">
-                Login to Join Auction
-              </NavLink>
-            )}
+        {/* ✅ Winner banner if auction has ended */}
+        {auctionEnded && topBid && (
+          <div style={{
+            marginTop: '10px',
+            padding: '10px',
+            borderRadius: '6px',
+            backgroundColor: '#f0f8ff',
+            border: '1px solid #007bff'
+          }}>
+            🏆 <strong>{topBid.bidder}</strong> won this item with a bid of <strong>${topBid.amount.toLocaleString()}</strong>
           </div>
         )}
       </div>
+
+      <div className="card-actions">
+        {!props.auth ? (
+          <NavLink to="/login" className="bid-button">
+            <h3>Login to Bid</h3>
+          </NavLink>
+        ) : (
+          !auctionEnded && (
+            <button onClick={handleShowBidMenu} className="view-all-button">
+              <h3>Make a Bid</h3>
+            </button>
+          )
+        )}
+
+        <button onClick={handleViewAllClick} className="view-all-button">
+          <h3>View Bids</h3>
+        </button>
+
+        {props.admin && (
+          <button onClick={handleDelete} className="delete-button">
+            <img src="./delete.png" alt="Delete" />
+          </button>
+        )}
+      </div>
+
+      {/* Bid history modal */}
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close-button" onClick={handleCloseModal}>&times;</span>
+            <h2>Bid History</h2>
+            {item.bidHistory.length > 0 ? (
+              <ul>
+                {item.bidHistory.slice(0, 5).map((bid, index) => (
+                  <li key={index}>
+                    <strong>{bid.bidder}</strong>: ${bid.amount}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No bids yet.</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Bid input modal */}
+      {showBidMenu && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close-button" onClick={handleCloseBidMenu}>&times;</span>
+            <h2>Make a Bid</h2>
+            <form onSubmit={handleSendBid}>
+              <label htmlFor="amount">Amount:</label>
+              <input
+                id="amount"
+                type="number"
+                value={newBid}
+                onChange={(e) => setNewBid(Number(e.target.value))}
+                className="input"
+                placeholder="Enter Bid amount"
+              />
+              <button type="submit" className="submit-button">Submit</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export default AboutAuction;
+export default Item;
