@@ -13,6 +13,7 @@ function Home(props) {
     const [target, setTarget] = useState(0);
 
     const fetchItems = async () => {
+        console.log("API Base URL:", import.meta.env.VITE_API_URL);
         await fetch(`${import.meta.env.VITE_API_URL}/items`, {
             method: 'GET',
             credentials: 'include'
