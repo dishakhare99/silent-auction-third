@@ -4,18 +4,18 @@ function AboutAuction(props) {
   const { total, target, deadline, auth, admin, onResetAuction } = props;
 
   const now = new Date();
+  const deadlineDate = new Date(deadline);
   const today = now.toDateString();
-  const deadlineDay = new Date(deadline).toDateString();
+  const deadlineDay = deadlineDate.toDateString();
 
-  const auctionEnded = now > deadline;
-  const isSameDay = today === deadlineDay;
-  const nextAuctionStart = new Date(deadline.getTime() + 24 * 60 * 60 * 1000); // Next day
+  // ✅ Fix: Only consider auction ended if the current date is after the deadline date
+  const auctionEnded = today !== deadlineDay && now > deadlineDate;
+  const nextAuctionStart = new Date(deadlineDate.getTime() + 24 * 60 * 60 * 1000);
 
-  const currentProgress = total;
   const progressPercent = Math.min((total / target) * 100, 100);
 
   const timeRemaining = () => {
-    if (auctionEnded && !isSameDay) return "Auction Ended";
+    if (auctionEnded) return "Auction Ended";
 
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
@@ -31,17 +31,16 @@ function AboutAuction(props) {
     <div>
       <div className="about-section">
         <h2 className="remaining-time">
-          Time Remaining: {auctionEnded && !isSameDay ? "Auction Ended" : timeRemaining()}
+          Time Remaining: {timeRemaining()}
         </h2>
 
         <p>
-          Embark on a journey of generosity at our virtual Summer Charity Gala
-          SnapBid, hosted on the cutting-edge SnapBid platform. Delight in
-          bidding on luxury getaways, art, and exclusive experiences — all for a
-          meaningful cause.
+          Embark on a journey of generosity at our virtual Summer Charity Gala SnapBid,
+          hosted on the cutting-edge SnapBid platform. Delight in bidding on luxury getaways,
+          captivating art, and exclusive experiences — all for a meaningful cause.
         </p>
 
-        {auctionEnded && !isSameDay ? (
+        {auctionEnded ? (
           <>
             <p style={{ marginTop: "1rem", fontWeight: "bold", color: "#b30000" }}>
               ⏳ New auction will start on:{" "}
@@ -75,8 +74,7 @@ function AboutAuction(props) {
               ></div>
             </div>
             <p>
-              Progress: ${currentProgress.toLocaleString("en-US")} / $
-              {target.toLocaleString("en-US")}
+              Progress: ${total.toLocaleString("en-US")} / ${target.toLocaleString("en-US")}
             </p>
 
             {!auth && (
