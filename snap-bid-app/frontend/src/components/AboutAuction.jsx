@@ -1,30 +1,30 @@
-import { NavLink } from "react-router-dom"; // Import NavLink for routing if needed
-// CSS import is removed as it is being handled in app.jsx
+import { NavLink } from "react-router-dom";
 
 function AboutAuction(props) {
   const currentProgress = props.total;
-  const auctionEnded = (props.deadline - new Date()) <= 0;
-  let goal = props.target;
+  const auctionEnded = props.deadline - new Date() <= 0;
+  const goal = props.target;
   const progressPercent = (currentProgress / goal) * 100;
-  
+
+  const nextAuctionStart = new Date(props.deadline.getTime() + 24 * 60 * 60 * 1000); // 24 hrs later
+
   const timeRemaining = () => {
-    const deadline = props.deadline;
     const now = new Date();
-    const difference = deadline - now;
-    if (difference <= 0) {
-    return "Auction Ended";
-    }
+    const difference = props.deadline - now;
+
+    if (difference <= 0) return "Auction Ended";
+
     const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((difference / (1000 * 60)) % 60);
-    if (auctionEnded) return 'Auction Ended';
-    return `${hours} hours, ${minutes} minutes`;
 
+    return `${hours} hours, ${minutes} minutes`;
   };
 
   return (
     <div>
       <div className="about-section">
         <h2 className="remaining-time">Time Remaining: {timeRemaining()}</h2>
+
         <p>
           Embark on a journey of generosity at our virtual Summer Charity Gala
           SnapBid, hosted on the cutting-edge SnapBid platform.
@@ -36,22 +36,31 @@ function AboutAuction(props) {
           contribute to our goal—join us for an unforgettable evening of giving
           and community.
         </p>
-        {!auctionEnded && (
-        <div className="progress-bar-container">
-          <div className="progress-bar">
-            <div
-              className="progress"
-              style={{ width: `${progressPercent}%` }}
-            ></div>
-          </div>
-          <p>
-            Progress: ${currentProgress.toLocaleString('en-US')} / ${goal.toLocaleString('en-US')}
+
+        {auctionEnded && (
+          <p style={{ marginTop: '1rem', fontWeight: 'bold', color: '#b30000' }}>
+            ⏳ New auction will start on: <strong>{nextAuctionStart.toLocaleString('en-US')}</strong>
           </p>
-          {!props.auth && (
-            <NavLink className="join-auction-button" to="/login">Login to Join Auction</NavLink>
-          )}
-        </div>
-      )}
+        )}
+
+        {!auctionEnded && (
+          <div className="progress-bar-container">
+            <div className="progress-bar">
+              <div
+                className="progress"
+                style={{ width: `${progressPercent}%` }}
+              ></div>
+            </div>
+            <p>
+              Progress: ${currentProgress.toLocaleString('en-US')} / ${goal.toLocaleString('en-US')}
+            </p>
+            {!props.auth && (
+              <NavLink className="join-auction-button" to="/login">
+                Login to Join Auction
+              </NavLink>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
