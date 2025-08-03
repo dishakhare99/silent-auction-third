@@ -37,7 +37,7 @@ app.use(express.json());
 
 // To fix CORS issue
 const corsOptions = {
-    origin: ['https://silent-auction-frontend-pi.vercel.app'], 
+    origin: ['https://snap-bid-app.vercel.app'], 
     methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
