@@ -3,25 +3,24 @@ import { NavLink, useNavigate } from 'react-router-dom';
 
 function Item(props) {
   const item = props.item; // ✅ Define item from props
-
   const [showModal, setShowModal] = useState(false);
   const [showBidMenu, setShowBidMenu] = useState(false);
   const [newBid, setNewBid] = useState(0); // ✅ Initialize safely
   const navigate = useNavigate();
 
-  // ✅ Set newBid once item is ready
- useEffect(() => {
-    if (item) {
-      const bid = item?.bidHistory?.[0]?.amount
+//  Prevent crash if item is missing or minBid is undefined
+  useEffect(() => {
+    if (item && typeof item.minBid === 'number') {
+      const initialBid = item.bidHistory?.[0]?.amount
         ? item.bidHistory[0].amount + 1
-        : item.minBid || 0;
-      setNewBid(bid);
+        : item.minBid;
+      setNewBid(initialBid);
     }
   }, [item]);
 
-  // ✅ Optional guard for safety
+  // Show nothing until item is ready
   if (!item || typeof item.minBid !== 'number') {
-    return <div>Loading item...</div>;
+    return null;
   }
 
   const handleShowBidMenu = () => setShowBidMenu(true);
