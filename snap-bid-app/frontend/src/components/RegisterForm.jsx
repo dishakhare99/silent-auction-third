@@ -14,7 +14,6 @@ function RegisterForm(props) {
             setPassword('');
         }
         const credentials = {userName, password};
-        try{
         const user = await fetch(`${import.meta.env.VITE_API_URL}/user/register`, {
           method: 'POST',
             body: JSON.stringify(credentials),
@@ -32,11 +31,7 @@ function RegisterForm(props) {
         alert(`"${userJson.userName}" is successfully registered.`);
         await props.runCheck();
         return navigate('/items');
-    } catch(error){
-      console.error("Registration error:", error);
-    alert("Something went wrong. Please try again.");
     }
-  }
 
     return (
         <div className="login-container">
@@ -64,7 +59,7 @@ function RegisterForm(props) {
               placeholder="Enter your password"
             />
           </div>
-          <button type="submit" className="button">
+          <button type="submit" className="button" onClick={handleSubmit}>
             Register
           </button>
         </form>
