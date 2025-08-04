@@ -25,11 +25,13 @@ function Home(props) {
       const auctionData = data.find(obj => obj.title === 'auctiondata');
       if (auctionData) {
         const objective = parseInt(auctionData.minBid);
-        let auctionDeadline = new Date();
+        let auctionDeadline = new Date(auctionData.description);
 
-        // 🔧 Set deadline to yesterday for testing
-        auctionDeadline.setDate(auctionDeadline.getDate() - 1);
-        auctionDeadline.setHours(23, 59, 59, 999);
+        const now = new Date();
+        if (now > auctionDeadline) {
+          auctionDeadline = new Date();
+          auctionDeadline.setHours(23, 59, 59, 999);
+        }
 
         setTarget(objective);
         setDeadline(auctionDeadline);
@@ -117,8 +119,9 @@ function Home(props) {
                 items
                   .filter(item => item.title !== 'auctiondata')
                   .map(item => {
-                    const sortedBids = item.bidHistory?.sort((a, b) => b.amount - a.amount);
+                    const sortedBids = [...item.bidHistory]?.sort((a, b) => b.amount - a.amount);
                     const winner = sortedBids?.[0];
+
                     return (
                       <li key={item._id}>
                         <strong>{item.title}</strong> —{' '}
@@ -148,6 +151,7 @@ function Home(props) {
                   />
                 );
               }
+              return null;
             })}
         </div>
       </main>
