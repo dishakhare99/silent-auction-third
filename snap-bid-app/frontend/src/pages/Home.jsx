@@ -11,6 +11,7 @@ function Home(props) {
   const [total, setTotal] = useState(0);
   const [deadline, setDeadline] = useState(new Date());
   const [target, setTarget] = useState(0);
+  const [lastAuctionEndedAt, setLastAuctionEndedAt] = useState(null);
 
   const fetchItems = async () => {
     try {
@@ -28,7 +29,12 @@ function Home(props) {
         let auctionDeadline = new Date(auctionData.description);
 
         const now = new Date();
+
         if (now > auctionDeadline) {
+          // Store last deadline for winner display logic
+          setLastAuctionEndedAt(new Date(auctionDeadline));
+
+          // Set new deadline to today 11:59:59 PM
           auctionDeadline = new Date();
           auctionDeadline.setHours(23, 59, 59, 999);
         }
@@ -86,7 +92,17 @@ function Home(props) {
     getTotal();
   }, [items]);
 
-  const showWinners = new Date() > deadline;
+  // Logic to determine winner visibility
+  const now = new Date();
+  let showWinners = false;
+
+  if (lastAuctionEndedAt) {
+    const nextAuctionEnd = new Date(lastAuctionEndedAt);
+    nextAuctionEnd.setDate(nextAuctionEnd.getDate() + 1); // 24h after last auction ended
+    nextAuctionEnd.setHours(23, 59, 59, 999);
+
+    showWinners = now > lastAuctionEndedAt && now < nextAuctionEnd;
+  }
 
   return (
     <>
@@ -113,7 +129,7 @@ function Home(props) {
 
         {showWinners && (
           <section className="winners-section">
-            <h2>🏆 Today's Winning Bids</h2>
+            <h2>🏆 Yesterday's Winning Bids</h2>
             <ul>
               {items &&
                 items
